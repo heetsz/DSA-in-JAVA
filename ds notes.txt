@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
+
+int* arr;
+int size;
+
+stack->arr = (int*)malloc(stack->size * sizeof(int));
+
+int evaluatePrefix(char* prefix) {
+	normal array operations
+	..........
+
+}
+
+
+ch - '0'  ...common technique to convert number in char to integer SINCE '3' - '0' = 51 - 48 = 3 
+
+
+    char prefix[100];
+    printf("Enter a prefix expression: ");
+    scanf("%s", prefix);
+
+char result[strlen(infix) + 1]; // Extra space for null terminator
+
+
+
+infix to postfix:
+
+ if operand in result(a to z || A to Z || 0 to 9)
+ if ( push in stack
+ if ) pop until (
+ if operator while (s->top != -1 && precedence(peek(s)) >= precedence(ch)), 
+ push(s, ch);
+
+pop remaining elements
+
