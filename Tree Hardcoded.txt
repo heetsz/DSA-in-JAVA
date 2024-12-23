@@ -1,0 +1,197 @@
+#include<stdlib.h>
+#include<stdio.h>
+
+struct node{
+    int data;
+    struct node*left;
+    struct node*right;
+}
+
+struct node* createtree(int data){
+    struct node* new = (struct node*)malloc(sizeof(struct node));
+    new->data = data;
+    new->left = NULL;
+    new->right = NULL;
+    return new;
+}
+
+int main(){
+    struct node* root = createtree(10);
+    root->left = createtree(20);
+    root->right = createtree(30);
+    root->left->left = createtree(40);
+    root->left->right = createtree(50);
+    root->right->left = createtree(60);
+    root->right->right = createtree(70);
+}
+
+/* ########################################################## ALL HARDCODED CODES #########################################################  */
+
+#include<stdlib.h>
+#include<stdio.h>
+#include <stdbool.h>
+
+struct node{
+    int data;
+    struct node*left;
+    struct node*right;
+};
+
+struct node* createtree(int data){
+    struct node* new = (struct node*)malloc(sizeof(struct node));
+    new->data = data;
+    new->left = NULL;
+    new->right = NULL;
+    return new;
+}
+
+struct queue{
+    struct node* arr[100];
+    int front;
+    int rear;
+};
+
+struct queue* createqueue(){
+    struct queue* q = (struct queue*)malloc(sizeof(struct queue));
+    q->front = -1;
+    q->rear = -1;
+    return q;
+}
+
+void enqueue(struct queue* q,struct node* root){
+    if(q->rear != 99){
+        q->arr[++(q->rear)] = root;
+        if(q->front == -1){
+            q->front = 0;
+        }
+    }
+    else{
+        printf("Queue is Full");
+        return ;
+    }
+}
+struct node* dequeue(struct queue* q){
+    if(q->front != -1){
+        struct node* deq = q->arr[q->front];
+        if(q->front == q->rear){
+            q->front = q->rear = -1;
+        }
+        else{
+        (q->front)++;
+        }
+        return deq;
+    }
+    else{
+        printf("Queue is empty");
+        return NULL;
+    }
+}
+
+void levelorder(struct node*root){
+    struct queue* q = createqueue();
+    enqueue(q,root);
+    while(q->rear != -1){
+        struct node* curr = dequeue(q);
+        printf("%d ",curr->data);
+        if (curr->left != NULL){
+            enqueue(q, curr->left);
+        }
+        if (curr->right != NULL){
+            enqueue(q, curr->right);
+        }
+    }
+}
+
+void rightview(struct node*root){
+    if (root == NULL) return;
+    struct queue* q = createqueue();
+    enqueue(q,root);
+    
+    while(q->rear != -1){
+/*Nodes at currentLevel*/int nodeCount = (q->rear - q->front + 1);//when 1st element is enqueued front updated to 0
+        for (int i = 1; i <= nodeCount; i++) {    // Hence +1 added;
+            struct node* curr = dequeue(q);
+            if (i == nodeCount) { //Print LastNode
+                printf("%d ", curr->data);
+            }
+            if (curr->left != NULL) {
+                enqueue(q, curr->left);
+            }
+            if (curr->right != NULL) {
+                enqueue(q, curr->right);
+            }
+        }
+    }
+}
+
+void zigzag(struct node* root) {
+    if (root == NULL) return;
+
+    struct queue* q = createqueue();
+    enqueue(q, root);
+    bool flag = true;  
+
+    while (q->rear != -1) {
+        int currnodecount = (q->rear - q->front + 1);
+        struct node* temp[currnodecount]; //Array of current levelNodes
+        for (int i = 0; i < currnodecount; i++) {
+            struct node* curr = dequeue(q);
+            temp[i] = curr;
+            if (curr->left != NULL) {
+                enqueue(q, curr->left);
+            }
+            if (curr->right != NULL) {
+                enqueue(q, curr->right);
+            }
+        }
+        if (flag) {
+            for (int i = 0; i < currnodecount; i++) {
+                printf("%d ", temp[i]->data);
+            }
+        } else {
+            for (int i = currnodecount - 1; i >= 0; i--) {
+                printf("%d ", temp[i]->data);
+            }
+        }
+        flag = !flag;
+    }
+}
+
+int totalNodes(struct node* node) {
+    if (node == NULL) return 0;  
+
+    int leftCount = totalNodes(node->left);  
+    int rightCount = totalNodes(node->right); 
+
+    return 1 + leftCount + rightCount;  
+}
+
+int dfs(struct node* root, int currentNumber) {
+    if (root == NULL) return 0;
+    currentNumber = currentNumber*10 + root->data;
+    if (root->left == NULL && root->right == NULL) {
+        return currentNumber;
+    }
+    int leftSum = dfs(root->left, currentNumber);
+    int rightSum = dfs(root->right, currentNumber);
+    return leftSum + rightSum;
+}
+
+int main(){
+    struct node* root = createtree(1);
+    root->left = createtree(2);
+    root->right = createtree(3);
+    root->left->left = createtree(4);
+    root->left->right = createtree(5);
+    root->right->left = createtree(6);
+    root->right->right = createtree(7);
+    levelorder(root);
+    printf("\n");
+    rightview(root);
+    printf("\n");
+    zigzag(root);
+    printf("\n");
+    printf("%d\n",totalNodes(root));
+    printf("%d",dfs(root,0));
+}
+

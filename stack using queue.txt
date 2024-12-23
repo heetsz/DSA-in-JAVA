@@ -1,0 +1,129 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the maximum size of the queue
+#define SIZE 100
+
+// Structure to represent a queue
+struct Queue {
+    int items[SIZE];
+    int front, rear;
+};
+
+// Function to create a queue
+struct Queue* createQueue() {
+    struct Queue* queue = (struct Queue*)malloc(sizeof(struct Queue));
+    queue->front = -1;
+    queue->rear = -1;
+    return queue;
+}
+
+// Function to check if the queue is empty
+int isEmpty(struct Queue* queue) {
+    return queue->front == -1;
+}
+
+// Function to check if the queue is full
+int isFull(struct Queue* queue) {
+    return queue->rear == SIZE - 1;
+}
+
+// Function to enqueue an element to the queue
+void enqueue(struct Queue* queue, int value) {
+    if (isFull(queue)) {
+        printf("Queue is full\n");
+        return;
+    }
+    if (isEmpty(queue)) {
+        queue->front = 0;
+    }
+    queue->items[++(queue->rear)] = value;
+}
+
+// Function to dequeue an element from the queue
+int dequeue(struct Queue* queue) {
+    if (isEmpty(queue)) {
+        printf("Queue is empty\n");
+        return -1;
+    }
+    int value = queue->items[queue->front];
+    if (queue->front == queue->rear) {
+        // If there was only one element, reset the queue
+        queue->front = -1;
+        queue->rear = -1;
+    } else {
+        queue->front++;
+    }
+    return value;
+}
+
+// Structure to represent a stack using two queues
+struct Stack {
+    struct Queue* q1;
+    struct Queue* q2;
+};
+
+// Function to create a stack using two queues
+struct Stack* createStack() {
+    struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
+    stack->q1 = createQueue();
+    stack->q2 = createQueue();
+    return stack;
+}
+
+// Function to push an element to the stack
+void push(struct Stack* stack, int value) {
+    // Enqueue the new element to q2
+    enqueue(stack->q2, value);
+
+    // Move all elements from q1 to q2
+    while (!isEmpty(stack->q1)) {
+        enqueue(stack->q2, dequeue(stack->q1));
+    }
+//pop operation is same
+//first add element to q3 then empty q1 to q2 and then change their address
+
+    // Swap q1 and q2
+    struct Queue* temp = stack->q1;
+    stack->q1 = stack->q2;
+    stack->q2 = temp;
+}
+
+// Function to pop an element from the stack
+int pop(struct Stack* stack) {
+    if (isEmpty(stack->q1)) {
+        printf("Stack is empty\n");
+        return -1;
+    }
+    return dequeue(stack->q1);
+}
+
+// Function to get the top element of the stack
+int top(struct Stack* stack) {
+    if (isEmpty(stack->q1)) {
+        printf("Stack is empty\n");
+        return -1;
+    }
+    return stack->q1->items[stack->q1->front];
+}
+
+// Function to check if the stack is empty
+int isEmptyStack(struct Stack* stack) {
+    return isEmpty(stack->q1);
+}
+
+int main() {
+    struct Stack* stack = createStack();
+
+    push(stack, 10);
+    push(stack, 20);
+    push(stack, 30);
+
+    printf("Top element: %d\n", top(stack));
+
+    printf("Popped element: %d\n", pop(stack));
+
+    printf("Top element: %d\n", top(stack));
+
+    return 0;
+}

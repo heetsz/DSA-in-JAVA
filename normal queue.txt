@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+#define SIZE 5  // Define the size of the queue
+
+struct queue {
+    int front;
+    int rear;
+    int arr[SIZE];
+};
+
+struct queue* createqueue() {
+    struct queue* q = (struct queue*)malloc(sizeof(struct queue));
+    q->front = -1;
+    q->rear = -1;
+    return q;
+}
+
+bool isfull(struct queue* q) {
+    return q->rear == SIZE - 1;  // Queue is full when rear reaches the last index
+}
+
+bool isEmpty(struct queue* q) {
+    return q->front == -1 || q->front > q->rear;  // Queue is empty if front is -1 or front exceeds rear
+}
+
+void enqueue(struct queue* q, int data) {
+    if (isfull(q)) {
+        printf("Queue is Full\n");
+        return;
+    }
+    if (isEmpty(q)) {
+        q->front = 0;  // When the first element is added
+    }
+    q->arr[++(q->rear)] = data;
+}
+
+int dequeue(struct queue* q) {
+    if (isEmpty(q)) {
+        printf("Queue is Empty!!\n");
+        return -1;
+    }
+    int value = q->arr[q->front];  // Store the dequeued value
+    if (q->front == q->rear) {  // When only 1 element is present
+        q->front = -1;
+        q->rear = -1;
+    } else {
+        q->front++;  // Increment front to remove the element
+    }
+    return value;
+}
+
+void display(struct queue* q) {
+    if (isEmpty(q)) {
+        printf("Queue is Empty\n");
+        return;
+    }
+    for (int i = q->front; i <= q->rear; i++) {
+        if (i == q->rear) {
+            printf("%d", q->arr[i]);
+        } else {
+            printf("%d, ", q->arr[i]);
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    struct queue* q = createqueue();
+    
+    enqueue(q, 1);
+    display(q);
+    
+    enqueue(q, 2);
+    display(q);
+    
+    int a = dequeue(q);
+    printf("\n%d dequeued\n", a);
+    display(q);
+    
+    enqueue(q, 4);
+    display(q);
+    
+    enqueue(q, 5);
+    display(q);
+    
+    enqueue(q, 6);
+    display(q);
+    
+    enqueue(q, 7);  // This should trigger the "Queue is Full" message
+    display(q);
+    
+    return 0;
+}

@@ -1,0 +1,62 @@
+#include <stdlib.h>
+#include <stdio.h>
+// For the given singly linked list swap the elements.eg.
+// if the given list is 1 2 3 4 5 then
+// the list will become 2 1 4 3 5
+struct Node {
+	int data;
+	struct Node * next;
+};
+void traverse(struct Node *temp)
+{
+	while(temp!=NULL)
+	{
+		printf("%d->",temp->data);
+		temp=temp->next;
+	}
+	printf("NULL\n");
+}
+
+struct Node * swap(struct Node * head) {
+	struct Node * p = head;
+	while(p!=NULL&&p->next!=NULL) {
+		struct Node * q = p;
+		int temp = p->data;
+		p->data = p->next->data;
+		p->next->data = temp;
+		p=p->next->next;
+	}
+	return head;
+}
+
+
+
+struct Node * insert(struct Node * head, int data) {
+	struct Node * ptr = (struct Node *) malloc(sizeof(struct Node));
+	ptr->data = data;
+	ptr->next = NULL;
+	if(head == NULL) {
+		return ptr;
+	}
+	struct Node*p = head;
+	while(p->next != NULL) {
+		p = p->next;
+	}
+	p->next = ptr;
+	ptr->next=NULL;
+	return head;
+}
+int main() {
+	struct Node * head = NULL;
+	head = insert(head,1);
+	head = insert(head,2);
+	head = insert(head,3);
+	head = insert(head,4);
+	head = insert(head,5);
+	head=insert(head,6);
+	printf("Original List: \n");
+	traverse(head);
+	printf("Swapped List: \n");
+	traverse(swap(head));
+	return 0;
+}

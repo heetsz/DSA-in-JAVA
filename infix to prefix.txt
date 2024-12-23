@@ -1,0 +1,162 @@
+#include <stdio.h>
+#include <ctype.h>  // For isdigit(), isalpha()
+#include <string.h> // For strrev(), strlen()
+#include <stdlib.h> // For exit()
+
+#define SIZE 100
+
+// Stack structure
+struct Stack {
+    char items[SIZE];
+    int top;
+};
+
+// Function to create a stack
+struct Stack* createStack() {
+    struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
+    stack->top = -1;
+    return stack;
+}
+
+// Function to check if the stack is empty
+int isEmpty(struct Stack* stack) {
+    return stack->top == -1;
+}
+
+// Function to push an element onto the stack
+void push(struct Stack* stack, char value) {
+    if (stack->top == SIZE - 1) {
+        printf("Stack overflow\n");
+        exit(1);
+    }
+    stack->items[++(stack->top)] = value;
+}
+
+// Function to pop an element from the stack
+char pop(struct Stack* stack) {
+    if (isEmpty(stack)) {
+        printf("Stack underflow\n");
+        exit(1);
+    }
+    return stack->items[(stack->top)--];
+}
+
+// Function to peek the top element of the stack
+char peek(struct Stack* stack) {
+    if (isEmpty(stack)) {
+        return '\0'; // Return null if stack is empty
+    }
+    return stack->items[stack->top];
+}
+
+// Function to check if a character is an operator
+int isOperator(char c) {
+    return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+}
+
+// Function to return precedence of operators
+int precedence(char op) {
+    switch (op) {
+        case '+':
+        case '-':
+            return 1;
+        case '*':
+        case '/':
+            return 2;
+        case '^':
+            return 3;
+        default:
+            return 0;
+    }
+}
+
+// Function to reverse a string
+void reverse(char* exp) {
+    int len = strlen(exp);
+    for (int i = 0; i < len / 2; i++) {
+        char temp = exp[i];
+        exp[i] = exp[len - 1 - i];
+        exp[len - 1 - i] = temp;
+    }
+}
+
+// Function to convert infix expression to postfix
+void infixToPostfix(char* infix, char* postfix) {
+    struct Stack* stack = createStack();
+    int i = 0, k = 0;
+
+    while (infix[i] != '\0') {
+        char c = infix[i];
+
+        // If the current character is an operand, add it to the postfix expression
+        if (isalnum(c)) {
+            postfix[k++] = c;
+        }
+        // If the current character is '(', push it to the stack
+        else if (c == '(') {
+            push(stack, c);
+        }
+        // If the current character is ')', pop and output from the stack
+        // until an '(' is encountered
+        else if (c == ')') {
+            while (!isEmpty(stack) && peek(stack) != '(') {
+                postfix[k++] = pop(stack);
+            }
+            pop(stack); // Pop '(' from the stack
+        }
+        // If an operator is encountered
+        else if (isOperator(c)) {
+            while (!isEmpty(stack) && precedence(peek(stack)) >= precedence(c)) {
+                postfix[k++] = pop(stack);
+            }
+            push(stack, c);
+        }
+
+        i++;
+    }
+
+    // Pop all the remaining operators from the stack
+    while (!isEmpty(stack)) {
+        postfix[k++] = pop(stack);
+    }
+
+    postfix[k] = '\0'; // Null-terminate the postfix expression
+}
+
+// Function to convert infix to prefix
+void infixToPrefix(char* infix, char* prefix) {
+    // Step 1: Reverse the infix expression
+    reverse(infix);
+
+    // Step 2: Replace '(' with ')' and vice versa
+    for (int i = 0; infix[i] != '\0'; i++) {
+        if (infix[i] == '(') {
+            infix[i] = ')';
+        } else if (infix[i] == ')') {
+            infix[i] = '(';
+        }
+    }
+
+    // Step 3: Convert the modified infix to postfix
+    char postfix[SIZE];
+    infixToPostfix(infix, postfix);
+
+    // Step 4: Reverse the postfix expression to get the prefix expression
+    reverse(postfix);
+
+    // Copy postfix (which is now prefix) to the result
+    strcpy(prefix, postfix);
+}
+
+int main() {
+    char infix[SIZE], prefix[SIZE];
+
+    printf("Enter infix expression: ");
+    scanf("%s", infix);
+
+    infixToPrefix(infix, prefix);
+
+    printf("Prefix Expression: %s\n", prefix);
+
+    return 0;
+}

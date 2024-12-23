@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
+struct Stack {
+    int capacity;
+    int top;
+    char* array;
+};
+
+struct Stack* createStack(int capacity) {
+    struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
+    stack->capacity = capacity;
+    stack->top = -1;
+    stack->array = (char*)malloc(stack->capacity * sizeof(char));
+    return stack;
+}
+
+bool isFull(struct Stack* stack) {
+    return stack->top == stack->capacity - 1;
+}
+
+bool isEmpty(struct Stack* stack) {
+    return stack->top == -1;
+}
+
+void push(struct Stack* stack, char item) {
+    if (isFull(stack)) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    stack->array[++stack->top] = item;
+}
+
+char pop(struct Stack* stack) {
+    if (isEmpty(stack)) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    return stack->array[stack->top--];
+}
+
+char peek(struct Stack* stack) {
+    if (isEmpty(stack)) {
+        return -1;
+    }
+    return stack->array[stack->top];
+}
+
+int prec(char ch) {
+    if (ch == '^') {
+        return 3;
+    } else if (ch == '*' || ch == '/') {
+        return 2;
+    } else if (ch == '+' || ch == '-') {
+        return 1;
+    }
+    return -1;
+}
+
+int main() {
+    struct Stack* a = createStack(50);
+    char str[50]; // 4*(2-(6*3+4)*2)+1
+    printf("Enter: ");
+    scanf("%s",str);
+    char res[50];
+    int resInd = 0;
+
+    for (int i = 0; i < strlen(str); i++) {
+        if (str[i] == '(') {
+            push(a, str[i]);
+        } 
+        else if (str[i] >= '0' && str[i] <= '9') {
+            res[resInd++] = str[i];
+        } 
+        else if (str[i] == ')') {
+            while (!isEmpty(a) && peek(a) != '(') {
+                res[resInd++] = pop(a);
+            }
+            pop(a);
+        } 
+        else { 
+            while (!isEmpty(a) && prec(peek(a)) >= prec(str[i])) {
+                res[resInd++] = pop(a);
+            }
+            push(a, str[i]);
+        }
+    }
+
+    while (!isEmpty(a)) {
+        res[resInd++] = pop(a);
+    }
+    
+    res[resInd] = '\0' ;
+
+    printf("Infix Expression: %s\n", str);
+    printf("Postfix Expression: %s\n", res);
+
+    return 0;
+}
